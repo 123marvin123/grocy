@@ -132,7 +132,12 @@ class RecipesApiController extends BaseApiController
 			$existingProductNames = array_map(function($p) { return $p->name; }, $existingProducts);
 			$this->_logMessage("Anzahl existierender Produkte gefunden: " . count($existingProductNames), $logMessages);
 
-			$recipeDataJson = $this->_getRecipeDataFromGemini($requestBody['html'], $apiKey, $existingProductNames, $logMessages);
+            // Fetch existing quantity unit names
+            $existingUnits = $this->getDatabase()->quantity_units()->where('active = ?', 1)->select('id, name')->fetchAll();
+            $existingUnitNames = array_map(function($u) { return $u->name; }, $existingUnits);
+            $this->_logMessage("Anzahl existierender Einheiten gefunden: " . count($existingUnitNames), $logMessages);
+
+			$recipeDataJson = $this->_getRecipeDataFromGemini($requestBody['html'], $apiKey, $existingProductNames, $existingUnitNames, $logMessages);
 			$recipeData = $this->_parseRecipeJson($recipeDataJson, $logMessages);
 
 			$preparedRecipeData = $this->_validateAndPrepareRecipeData($recipeData, $logMessages);
@@ -202,7 +207,7 @@ class RecipesApiController extends BaseApiController
 		return $apiKey;
 	}
 
-	private function _getRecipeDataFromGemini(string $htmlContent, string $apiKey, array $existingProductNames, array &$logMessages): string
+	private function _getRecipeDataFromGemini(string $htmlContent, string $apiKey, array $existingProductNames, array $existingUnitNames, array &$logMessages): string
 	{
 		$apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' . urlencode($apiKey);
 		$this->_logMessage("API-URL für Rezept-Extraktion: " . $apiUrl, $logMessages);
@@ -212,6 +217,12 @@ class RecipesApiController extends BaseApiController
             $existingProductsString = "Keine";
         }
         $this->_logMessage("Existierende Produktnamen für Prompt (gekürzt): " . substr($existingProductsString, 0, 200) . "...", $logMessages);
+
+        $existingUnitsString = implode(", ", array_map(function($name) { return '"' . addslashes($name) . '"'; }, $existingUnitNames));
+        if (empty($existingUnitsString)) {
+            $existingUnitsString = "Keine";
+        }
+        $this->_logMessage("Existierende Einheiten für Prompt (gekürzt): " . substr($existingUnitsString, 0, 200) . "...", $logMessages);
 
 		$prompt = <<<PROMPT
 		Extrahiere Rezeptinformationen aus dem folgenden HTML-Inhalt. Gib die Ergebnisse ausschließlich als JSON-Objekt zurück, ohne umschließende Markdown-Formatierung (wie ```json ... ```). Das JSON sollte die folgende Struktur haben:
@@ -224,7 +235,7 @@ class RecipesApiController extends BaseApiController
 				{
 					"name": "Produktname (z.B. 'Ei' aus '1 Eigelb')",
 					"amount": 1.0,
-					"unit": "Stück",
+					"unit": "Einheit (z.B. 'Stück', 'g', 'Kilogramm (kg)')",
 					"note": "Zusätzliche Info (z.B. 'nur Eigelb', 'geschmolzen', kann null sein)",
 					"ingredient_group": "Gruppe (z.B. 'Teig', 'Belag', kann null sein)"
 				}
@@ -238,8 +249,9 @@ class RecipesApiController extends BaseApiController
 		- Bei Zutaten: Extrahiere den reinen Produktnamen (z.B. aus "1 großes Eigelb" wird "Ei").
 		- Füge eine Notiz (`note`) hinzu, wenn die Zutat spezifiziert wurde (z.B. "nur Eigelb", "groß", "geschmolzen").
 		- Wenn die Zutaten im HTML nach Gruppen (z.B. "Für den Teig", "Für den Belag") unterteilt sind, gib den Gruppennamen im Feld `ingredient_group` an, ansonsten `null`.
-		- Ersetze Cookidoo/Thermomix Zeichen wie '' durch ein entsprechendes Emoji oder einem beschreibenden Text ('Kneten').
-		- **Produkt-Matching:** Versuche, den extrahierten Produktnamen (`name` in `ingredients`) auf einen der folgenden bereits existierenden Produktnamen zu mappen, wenn er sehr ähnlich oder identisch ist. Gib den gematchten Namen zurück. Existierende Produkte: [$existingProductsString]. Wenn kein passendes Produkt gefunden wird, gib den extrahierten Namen zurück.
+		 - **Produkt-Matching:** Versuche, den extrahierten Produktnamen (`name` in `ingredients`) auf einen der folgenden bereits existierenden Produktnamen zu mappen, wenn er sehr ähnlich oder identisch ist. Gib den gematchten Namen zurück. Existierende Produkte: [$existingProductsString]. Wenn kein passendes Produkt gefunden wird, gib den extrahierten Namen zurück.
+		- **Einheiten-Matching:** Versuche, die extrahierte Einheit (`unit` in `ingredients`) auf eine der folgenden bereits existierenden Einheiten zu mappen, wenn sie sehr ähnlich oder identisch ist (z.B. "kg" auf "Kilogramm (kg)"). Gib den gematchten, existierenden Namen zurück. Existierende Einheiten: [$existingUnitsString]. Wenn keine passende Einheit gefunden wird, gib die extrahierte Einheit zurück.
+		- **Einheitliche Einheiten für gleiche Zutat:** Wenn eine Zutat mehrfach im Rezept vorkommt (z.B. "2 Stück Zwiebeln" und "80g Zwiebeln"), dann verwende für alle Vorkommen dieser Zutat die gleiche Einheit. Bevorzuge dabei SI-Einheiten wie Gramm (g) oder Milliliter (ml). Rechne Mengen bestmöglich um (z.B. Stück in Gramm, basierend auf einem durchschnittlichen Gewicht). Gib die umgerechnete Menge und die SI-Einheit an.
 
 		HTML-Inhalt:
 		$htmlContent
