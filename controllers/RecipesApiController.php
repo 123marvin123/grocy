@@ -235,7 +235,7 @@ class RecipesApiController extends BaseApiController
 				{
 					"name": "Produktname (z.B. 'Ei' aus '1 Eigelb')",
 					"amount": 1.0,
-					"unit": "Einheit (z.B. 'Stück', 'g', 'Kilogramm (kg)')",
+					"unit": "Einheit (z.B. 'Stück', 'g', 'Kilogramm (kg)'), bevorzugt SI-Einheit wie Gramm (g) oder Milliliter (ml)",
 					"note": "Zusätzliche Info (z.B. 'nur Eigelb', 'geschmolzen', kann null sein)",
 					"ingredient_group": "Gruppe (z.B. 'Teig', 'Belag', kann null sein)"
 				}
@@ -249,9 +249,8 @@ class RecipesApiController extends BaseApiController
 		- Bei Zutaten: Extrahiere den reinen Produktnamen (z.B. aus "1 großes Eigelb" wird "Ei").
 		- Füge eine Notiz (`note`) hinzu, wenn die Zutat spezifiziert wurde (z.B. "nur Eigelb", "groß", "geschmolzen").
 		- Wenn die Zutaten im HTML nach Gruppen (z.B. "Für den Teig", "Für den Belag") unterteilt sind, gib den Gruppennamen im Feld `ingredient_group` an, ansonsten `null`.
-		 - **Produkt-Matching:** Versuche, den extrahierten Produktnamen (`name` in `ingredients`) auf einen der folgenden bereits existierenden Produktnamen zu mappen, wenn er sehr ähnlich oder identisch ist. Gib den gematchten Namen zurück. Existierende Produkte: [$existingProductsString]. Wenn kein passendes Produkt gefunden wird, gib den extrahierten Namen zurück.
+		- **Produkt-Matching:** Versuche, den extrahierten Produktnamen (`name` in `ingredients`) auf einen der folgenden bereits existierenden Produktnamen zu mappen, wenn er sehr ähnlich oder identisch ist. Gib den gematchten Namen zurück. Existierende Produkte: [$existingProductsString]. Wenn kein passendes Produkt gefunden wird, gib den extrahierten Namen zurück.
 		- **Einheiten-Matching:** Versuche, die extrahierte Einheit (`unit` in `ingredients`) auf eine der folgenden bereits existierenden Einheiten zu mappen, wenn sie sehr ähnlich oder identisch ist (z.B. "kg" auf "Kilogramm (kg)"). Gib den gematchten, existierenden Namen zurück. Existierende Einheiten: [$existingUnitsString]. Wenn keine passende Einheit gefunden wird, gib die extrahierte Einheit zurück.
-		- **Einheitliche Einheiten für gleiche Zutat:** Wenn eine Zutat mehrfach im Rezept vorkommt (z.B. "2 Stück Zwiebeln" und "80g Zwiebeln"), dann verwende für alle Vorkommen dieser Zutat die gleiche Einheit. Bevorzuge dabei SI-Einheiten wie Gramm (g) oder Milliliter (ml). Rechne Mengen bestmöglich um (z.B. Stück in Gramm, basierend auf einem durchschnittlichen Gewicht). Gib die umgerechnete Menge und die SI-Einheit an.
 
 		HTML-Inhalt:
 		$htmlContent
@@ -479,7 +478,8 @@ class RecipesApiController extends BaseApiController
 		Das JSON muss exakt die Struktur {"singular": "...", "plural": "..."} haben.
 		Wenn Singular und Plural identisch sind (z.B. bei 'Stück', 'g', 'ml'), gib denselben Wert für beide an.
 		Gib die Namen möglichst auf Deutsch zurück. Gib für den Singular Fall immer die Maßeinheit in der Form an, 
-		wie sie von mir übergeben wurde.
+		wie sie von mir übergeben wurde. Gib Begriffe immer ungekürzt an (nicht Pck., sondern Packung). Einheiten wie
+		EL, TL kannst du jedoch als solche lassen, da sie allgemein bekannt sind.
 
 		Beispiele:
 		Einheit: Tasse -> {"singular": "Tasse", "plural": "Tassen"}
