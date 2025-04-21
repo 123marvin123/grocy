@@ -96,9 +96,19 @@ The web frontend uses exactly this API for pretty much everything. So everything
 
 Some fields (with a barcode icon above) also allow to select a value by scanning a barcode. It works best when your barcode reader prefixes every barcode with a letter which is normally not part of a item name (I use a `$`) and sends a `TAB` after a scan.
 
-Additionally it's also possible to use your device camera to scan a barcode by using the camera button on the right side of the corresponding input field (powered by [Quagga2](https://github.com/ericblade/quagga2), totally offline / client-side camera stream processing, please note due to browser security restrictions, this only works when serving Grocy via a secure connection (`https://`)). [Here](https://www.youtube.com/watch?v=veezFX4X1JU) and [there](https://www.youtube.com/watch?v=Y5YH6IJFnfc) are quick video demos of that.
+Additionally it's also possible to use your device camera to scan a barcode by using the camera button on the right side of the corresponding input field (powered by [ZXing](https://github.com/zxing-js/library), totally offline / client-side camera stream processing, please note due to browser security restrictions, this only works when serving Grocy via a secure connection (`https://`)). [Here](https://www.youtube.com/watch?v=veezFX4X1JU) and [there](https://www.youtube.com/watch?v=Y5YH6IJFnfc) are quick video demos of that.
 
 _My personal recommendation: Use a USB barcode laser scanner. They are cheap and work 1000 % better, faster, under any lighting condition and from any angle._
+
+### Barcode lookup via external services
+
+Products can be directly added to the database via looking them up against external services by a barcode.
+
+This can be done in-place using the product picker workflow "External barcode lookup" (the workflow dialog is displayed when entering something unknown in any product input field) Quick video demo: <https://www.youtube.com/watch?v=-moXPA-VvGc>
+
+A plugin for [Open Food Facts](https://world.openfoodfacts.org/) is included and used by default (see the `data/config.php` option `STOCK_BARCODE_LOOKUP_PLUGIN`).
+
+See that plugin or `plugins/DemoBarcodeLookupPlugin.php` for a commented example implementation if you want to build a plugin.
 
 ### Input shorthands for date fields
 
@@ -123,15 +133,12 @@ The following shorthands are available:
 Wherever a button contains a bold highlighted letter, this is a shortcut key.
 Example: Button "**P** Add as new product" can be "pressed" by using the `P` key on your keyboard.
 
-### Barcode lookup via external services
+### Installable web app (PWA)
 
-Products can be directly added to the database via looking them up against external services by a barcode.
+Grocy's web frontend is responsive and an "installable web app" ([PWA](https://en.wikipedia.org/wiki/Progressive_web_app), without providing any offline usage capabilities), that provides a pretty native mobile app-like experience without the need for additional tools.
 
-This can be done in-place using the product picker workflow "External barcode lookup" (the workflow dialog is displayed when entering something unknown in any product input field) Quick video demo: <https://www.youtube.com/watch?v=-moXPA-VvGc>
-
-A plugin for [Open Food Facts](https://world.openfoodfacts.org/) is included and used by default (see the `data/config.php` option `STOCK_BARCODE_LOOKUP_PLUGIN`).
-
-See that plugin or `plugins/DemoBarcodeLookupPlugin.php` for a commented example implementation if you want to build a plugin.
+- Quick video demo on Android/Firefox: <https://www.youtube.com/watch?v=L38drVZfwHs>
+- Quick video demo on Android/Chrome: <https://www.youtube.com/watch?v=rjLdXUFDNuk>
 
 ### Database migrations
 
