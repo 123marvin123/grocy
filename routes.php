@@ -212,8 +212,8 @@ $app->group('/api', function (RouteCollectorProxy $group)
 	$group->post('/recipes/{recipeId}/consume', '\Grocy\Controllers\RecipesApiController:ConsumeRecipe');
 	$group->get('/recipes/fulfillment', '\Grocy\Controllers\RecipesApiController:GetRecipeFulfillment');
 	$group->Post('/recipes/{recipeId}/copy', '\Grocy\Controllers\RecipesApiController:CopyRecipe');
+	$group->Post('/recipes/import-from-html', '\Grocy\Controllers\RecipesApiController:ImportFromHtml');
 	$group->get('/recipes/{recipeId}/printlabel', '\Grocy\Controllers\RecipesApiController:RecipePrintLabel');
-
 
 	// Chores
 	$group->get('/chores', '\Grocy\Controllers\ChoresApiController:Current');

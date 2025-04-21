@@ -61,6 +61,10 @@
 					href="{{ $U('/recipe/new') }}">
 					{{ $__t('Add') }}
 				</a>
+				<a id="import-recipe-button" class="btn btn-outline-secondary responsive-button m-1 mt-md-0 mb-md-0 float-right"
+					href="#">
+					<i class="fa-solid fa-file-import"></i> {{ $__t('Import from web page') }}
+				</a>
 			</div>
 		</div>
 
@@ -675,4 +679,58 @@
 @include('components.productcard', [
 'asModal' => true
 ])
+
+<div class="modal fade" id="import-recipe-modal" tabindex="-1">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title w-100">
+					<span>{{ $__t('Import recipe from web page') }}</span>
+				</h4>
+			</div>
+			<div class="modal-body">
+				<div id="import-recipe-form">
+					<div class="form-group">
+						<label for="html-content">{{ $__t('HTML content') }}</label>
+						<textarea class="form-control" id="html-content" name="html-content" rows="10" required></textarea>
+						<div class="invalid-feedback">{{ $__t('This field is required') }}</div>
+						<small class="form-text text-muted">{{ $__t('Paste HTML content of a recipe page here') }}</small>
+					</div>
+					<div class="form-group" id="api-key-row">
+						<label for="gemini-api-key">{{ $__t('Google Gemini API Key') }}</label>
+						<div class="input-group">
+							<input type="password" class="form-control" id="gemini-api-key" name="gemini-api-key">
+							<div class="input-group-append">
+								<button id="save-api-key" class="btn btn-outline-secondary" type="button">{{ $__t('Save') }}</button>
+							</div>
+						</div>
+						<div class="invalid-feedback">{{ $__t('A valid API key is required') }}</div>
+						<small class="form-text text-muted">{{ $__t('Enter your Google Gemini API Key or save it for future use') }}</small>
+					</div>
+				</div>
+				
+				<div id="import-recipe-form-loading" class="d-none">
+					<div class="text-center">
+						<i class="fa-solid fa-spinner fa-spin fa-5x"></i>
+						<h4 class="mt-2">{{ $__t('Importing recipe...') }}</h4>
+						<p>{{ $__t('This may take a few seconds') }}</p>
+					</div>
+				</div>
+				
+				<div id="recipe-import-result" class="d-none">
+					<!-- Ergebnisse werden hier angezeigt -->
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">{{ $__t('Cancel') }}</button>
+				<button id="import-recipe-submit" class="btn btn-primary">{{ $__t('Import') }}</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+@push('pageScripts')
+<script src="{{ $U('/viewjs/recipeimport.js?v=', true) }}{{ $version }}"></script>
+@endpush
+
 @stop
