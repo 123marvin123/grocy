@@ -249,7 +249,6 @@ class RecipesApiController extends BaseApiController
 		- Bei Zutaten: Extrahiere den reinen Produktnamen (z.B. aus "1 großes Eigelb" wird "Ei").
 		- Füge eine Notiz (`note`) hinzu, wenn die Zutat spezifiziert wurde (z.B. "nur Eigelb", "groß", "geschmolzen").
 		- Wenn die Zutaten im HTML nach Gruppen (z.B. "Für den Teig", "Für den Belag") unterteilt sind, gib den Gruppennamen im Feld `ingredient_group` an, ansonsten `null`.
-		- **Produkt-Matching:** Versuche, den extrahierten Produktnamen (`name` in `ingredients`) auf einen der folgenden bereits existierenden Produktnamen zu mappen, wenn er identisch ist. Gib den gematchten Namen zurück. Existierende Produkte: [$existingProductsString]. Wenn kein passendes Produkt gefunden wird, gib den extrahierten Namen zurück. Ersetze das Produkt jedoch nicht mit einem anderen!
 		- **Einheiten-Matching:** Versuche, die extrahierte Einheit (`unit` in `ingredients`) auf eine der folgenden bereits existierenden Einheiten zu mappen, wenn sie sehr ähnlich oder identisch ist (z.B. "kg" auf "Kilogramm (kg)"). Gib den gematchten, existierenden Namen zurück. Existierende Einheiten: [$existingUnitsString]. Wenn keine passende Einheit gefunden wird, gib die extrahierte Einheit zurück.
 
 		HTML-Inhalt:
