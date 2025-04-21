@@ -411,12 +411,12 @@ class RecipesApiController extends BaseApiController
 					$this->_ensureUnitConversion($productId, $quantityUnitId, $stockUnitId, $ingredientLog);
 				}
 
-				$amountInStockUnit = $this->_calculateAmountInStockUnit($productId, $ingredientAmount, $quantityUnitId, $stockUnitId, $ingredientUnitName, $ingredientLog);
+				//$amountInStockUnit = $this->_calculateAmountInStockUnit($productId, $ingredientAmount, $quantityUnitId, $stockUnitId, $ingredientUnitName, $ingredientLog);
 
 				$this->_insertRecipePosition([
 					'recipe_id' => $recipeId,
 					'product_id' => $productId,
-					'amount' => $amountInStockUnit,
+					'amount' => $ingredientAmount,
 					'qu_id' => $quantityUnitId,
 					'note' => $ingredientNote,
 					'ingredient_group' => $ingredientGroup,
