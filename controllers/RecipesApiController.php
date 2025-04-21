@@ -417,7 +417,7 @@ class RecipesApiController extends BaseApiController
 					'recipe_id' => $recipeId,
 					'product_id' => $productId,
 					'amount' => $amountInStockUnit,
-					'qu_id' => $stockUnitId,
+					'qu_id' => $quantityUnitId,
 					'note' => $ingredientNote,
 					'ingredient_group' => $ingredientGroup,
 				], $ingredientLog);
